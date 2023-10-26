@@ -1,4 +1,6 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
+require 'simplecov'
+SimpleCov.start
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
@@ -60,4 +62,22 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
+
+VCR.configure do |config|
+  config.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
+  config.hook_into :webmock
+  # config.filter_sensitive_data('tmdb_key') { ENV['tmdb_key'] } <- from gist
+  # config.filter_sensitive_data('DONT_SHARE_MY_TMDB_KEY') do <- from project
+  #   Rails.application.credentials.tmdb[:key]
+  # end
+  config.configure_rspec_metadata!
+  config.default_cassette_options = { serialize_with: :json, record: :new_episodes }
 end
